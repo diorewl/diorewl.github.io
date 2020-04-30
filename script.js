@@ -1,51 +1,66 @@
-/*
- * Noel Delgado | @pixelia_me
- */
+/*----------------------------------------------------*/
+/* Quote Loop
+------------------------------------------------------ */
 
-var items = []
-  , point = document.querySelector('svg').createSVGPoint();
-
-function getCoordinates(e, svg) {
-  point.x = e.clientX;
-  point.y = e.clientY;
-  return point.matrixTransform(svg.getScreenCTM().inverse());
+function fade($ele) {
+    $ele.fadeIn(1000).delay(3000).fadeOut(1000, function() {
+        var $next = $(this).next('.quote');
+        fade($next.length > 0 ? $next : $(this).parent().children().first());
+   });
 }
+fade($('.quoteLoop > .quote').first());
 
-function changeColor(e) {
-  document.body.className = e.currentTarget.className;
-}
 
-function Item(config) {
-  Object.keys(config).forEach(function (item) {
-    this[item] = config[item];
-  }, this);
-  this.el.addEventListener('mousemove', this.mouseMoveHandler.bind(this));
-  this.el.addEventListener('touchmove', this.touchMoveHandler.bind(this));
-}
+/*----------------------------------------------------*/
+/* Navigation
+------------------------------------------------------ */
 
-Item.prototype = {
-  update: function update(c) {
-    this.clip.setAttribute('cx', c.x);
-    this.clip.setAttribute('cy', c.y);
-  },
-  mouseMoveHandler: function mouseMoveHandler(e) {
-    this.update(getCoordinates(e, this.svg));
-  },
-  touchMoveHandler: function touchMoveHandler(e) {
-    e.preventDefault();
-    var touch = e.targetTouches[0];
-    if (touch) return this.update(getCoordinates(touch, this.svg));
-  }
-};
+$(window).scroll(function() {
 
-[].slice.call(document.querySelectorAll('.item'), 0).forEach(function (item, index) {
-  items.push(new Item({
-    el: item,
-    svg: item.querySelector('svg'),
-    clip: document.querySelector('#clip-'+index+' circle'),
-  }));
+    if ($(window).scrollTop() > 300) {
+        $('.main_nav').addClass('sticky');
+    } else {
+        $('.main_nav').removeClass('sticky');
+    }
 });
 
-[].slice.call(document.querySelectorAll('button'), 0).forEach(function (button) {
-  button.addEventListener('click', changeColor);
+// Mobile Navigation
+$('.mobile-toggle').click(function() {
+    if ($('.main_nav').hasClass('open-nav')) {
+        $('.main_nav').removeClass('open-nav');
+    } else {
+        $('.main_nav').addClass('open-nav');
+    }
 });
+
+$('.main_nav li a').click(function() {
+    if ($('.main_nav').hasClass('open-nav')) {
+        $('.navigation').removeClass('open-nav');
+        $('.main_nav').removeClass('open-nav');
+    }
+});
+
+
+/*----------------------------------------------------*/
+/* Smooth Scrolling
+------------------------------------------------------ */
+
+jQuery(document).ready(function($) {
+
+   $('.smoothscroll').on('click',function (e) {
+	    e.preventDefault();
+
+	    var target = this.hash,
+	    $target = $(target);
+
+	    $('html, body').stop().animate({
+	        'scrollTop': $target.offset().top
+	    }, 800, 'swing', function () {
+	        window.location.hash = target;
+	    });
+	});
+  
+});
+
+
+TweenMax.staggerFrom(".heading", 0.8, {opacity: 0, y: 20, delay: 0.2}, 0.4);
